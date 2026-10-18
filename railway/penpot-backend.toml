@@ -1,0 +1,18 @@
+# penpot-backend: Clojure/JVM API, migrations, workers. Private (no domain), port 6060.
+[build]
+image = "penpotapp/backend:2.18.3@sha256:2df1b3440d2a82cc3571db211b4ffdfa2b89ccc910759e8d5e9387fb62971b5c"
+
+[deploy]
+# The image has no ENTRYPOINT (CMD is `/bin/bash run.sh` in WORKDIR /opt/penpot/backend).
+# The start command adds a tiny read-only static server (python3 is in the image) on port 6070
+# that exposes the assets volume to penpot-frontend over the private network, then execs the
+# normal backend. Port 6063 is taken by Penpot's prepl server, hence 6070.
+startCommand = "/bin/bash -c 'python3 -m http.server 6070 --bind :: --directory /opt/data/assets >/dev/null 2>&1 & exec /bin/bash run.sh'"
+# /readyz answers 200 "OK" once Postgres and Valkey are connected and migrations ran.
+healthcheckPath = "/readyz"
+healthcheckTimeout = 600
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+# Uploaded images, fonts, thumbnails, exports (PENPOT_OBJECTS_STORAGE_FS_DIRECTORY).
+# Railway volumes mount root-owned and the image runs as uid 1001, so RAILWAY_RUN_UID=0.
+requiredMountPath = "/opt/data/assets"

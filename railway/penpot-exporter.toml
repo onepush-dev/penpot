@@ -1,0 +1,11 @@
+# penpot-exporter: Node + headless Chromium that renders PNG/JPEG/SVG/PDF exports by loading
+# the web app from penpot-frontend over the private network. Private, port 6061.
+[build]
+image = "penpotapp/exporter:2.18.3@sha256:418232d6ca3120b1c2bfde298a56a05a1f41f567cd8494deac3fe7fbc186cfbd"
+
+[deploy]
+# No start command: image CMD `node app.js`.
+healthcheckPath = "/readyz"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

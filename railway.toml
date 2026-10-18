@@ -1,0 +1,25 @@
+# Reference only. This template deploys the official penpotapp/* images directly (no build
+# step); the Railway marketplace template is generated from the live project in the dashboard.
+# These are the settings of the public `penpot-frontend` service (nginx web app + reverse proxy).
+# penpot-backend, penpot-exporter and Valkey live in railway/*.toml; Postgres is Railway's
+# own Postgres template. Start commands are also in railway/*-start-command.txt.
+
+[build]
+image = "penpotapp/frontend:2.18.3@sha256:bb8abe27d53de84c95597f2c02c0e702b2779971fb0703e543f9ecf183e999f6"
+
+[deploy]
+# Railway replaces the image ENTRYPOINT when a start command is set, so the command calls the
+# upstream /entrypoint.sh itself. Before that it writes two nginx override files:
+#  - http.d/railway-upstreams.conf: `upstream penpot-backend|penpot-exporter|penpot-assets`
+#    with `server <private-domain>:<port> resolve;` so nginx re-resolves Railway private DNS
+#    while running (a backend redeploy gets a new private IP; a plain proxy_pass host would
+#    keep the stale one). PENPOT_BACKEND_URI / PENPOT_EXPORTER_URI point at these upstreams.
+#  - server.d/railway-assets.conf: a regex location that wins over upstream's
+#    `location /internal/assets { alias /opt/data/assets; }`. Railway volumes attach to one
+#    service only, so instead of reading a shared disk nginx fetches the file from the
+#    backend's volume over the private network (port 6070, see penpot-backend).
+startCommand = """/bin/bash -c 'printf "upstream penpot-backend { zone penpot_backend 64k; server %s:6060 resolve; }\\nupstream penpot-exporter { zone penpot_exporter 64k; server %s:6061 resolve; }\\nupstream penpot-assets { zone penpot_assets 64k; server %s:6070 resolve; }\\n" "$PENPOT_BACKEND_HOST" "$PENPOT_EXPORTER_HOST" "$PENPOT_BACKEND_HOST" > /etc/nginx/overrides/http.d/railway-upstreams.conf && printf "location ~ ^/internal/assets/(.*)\\$ { internal; proxy_pass http://penpot-assets/\\$1; proxy_hide_header Content-Type; include /etc/nginx/nginx-security-headers.conf; }\\n" > /etc/nginx/overrides/server.d/railway-assets.conf && exec /bin/bash /entrypoint.sh nginx -g "daemon off;"'"""
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

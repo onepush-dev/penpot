@@ -1,0 +1,10 @@
+# Valkey: Redis-compatible pub/sub + cache for real-time notifications. Private, port 6379.
+# Same major/minor as upstream compose (valkey/valkey:8.1). No volume: upstream keeps no
+# persistent Valkey data either (messages are transient).
+[build]
+image = "valkey/valkey:8.1.10@sha256:640c5e62cea04b6d6f2084232651d0cc70362d31f4f805e7be94dbed6855e8f2"
+
+[deploy]
+# No start command. The image entrypoint appends $VALKEY_EXTRA_FLAGS to `valkey-server`,
+# which carries --requirepass plus upstream's --maxmemory 128mb --maxmemory-policy volatile-lfu.
+restartPolicyType = "ALWAYS"

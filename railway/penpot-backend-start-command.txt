@@ -1,0 +1,1 @@
+/bin/bash -c 'python3 -m http.server 6070 --bind :: --directory /opt/data/assets >/dev/null 2>&1 & exec /bin/bash run.sh'
