@@ -1,6 +1,6 @@
 # Penpot — open-source Figma alternative for design and prototyping (v2.18.3, frontend + backend + exporter + Postgres + Valkey). Deploy on Railway with one click.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/TEMPLATE_CODE)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/iUQla_)
 
 [Penpot](https://penpot.app) is the open-source design and prototyping platform from [penpot/penpot](https://github.com/penpot/penpot) (MPL-2.0). It runs in the browser and is built on open standards (SVG, CSS, HTML). You get vector design, components and variants, design tokens, flex and grid layout, interactive prototypes, real-time multiplayer editing, plugins, and an inspect mode that gives developers CSS, SVG and HTML. This template runs the **official** `penpotapp/frontend`, `penpotapp/backend` and `penpotapp/exporter` images at **2.18.3**, each pinned by tag and digest, laid out like upstream's `docker/images/docker-compose.yaml`. It needs **no deploy-time input**: open the URL and create your account.
 
